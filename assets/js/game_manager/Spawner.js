@@ -24,6 +24,8 @@ class Spawner {
   spawnObject() {
     if (this.objectType === SpawnerType.CHEST) {
       this.spawnChest();
+    } else if (this.objectType === SpawnerType.MONSTER) {
+      this.spawnMonster();
     }
   }
 
@@ -37,6 +39,22 @@ class Spawner {
     );
     this.objectsCreated.push(chest);
     this.addObject(chest.id, chest);
+  }
+
+  //TODO: need to make random monster to pick which sprite an which weapon
+  spawnMonster() {
+    const location = this.pickRandomLocation();
+    const monster = new MonsterModel(
+      location[0],
+      location[1],
+      randomNumber(10, 30),
+      this.id,
+      randomNumber(0, 20), //this is where i will put what frame the monster should start on
+      randomNumber(3, 5),
+      1
+    );
+    this.objectsCreated.push(monster);
+    this.addObject(monster.id, monster);
   }
 
   pickRandomLocation() {

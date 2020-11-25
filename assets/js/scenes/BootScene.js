@@ -27,6 +27,10 @@ class BootScene extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 32,
     });
+    this.load.spritesheet("monsters", "assets/images/monsters.png", {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
     this.load.spritesheet("mainCharacter", "assets/images/spear-warrior.png", {
       frameWidth: 64,
       frameHeight: 64,
