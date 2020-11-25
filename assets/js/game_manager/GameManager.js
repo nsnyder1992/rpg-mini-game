@@ -46,7 +46,14 @@ class GameManager {
     });
   }
 
-  setupEventListeners() {}
+  setupEventListeners() {
+    this.scene.events.on("pickUpChest", (chestId) => {
+      //update the spawner
+      if (this.chests[chestId]) {
+        this.spawners[this.chests[chestId].spawnerId].removeObject(chestId);
+      }
+    });
+  }
 
   setupSpawners() {
     //create chest spawners
@@ -73,13 +80,14 @@ class GameManager {
       Math.floor(Math.random() * this.playerLocations.length)
     ];
     this.scene.events.emit("spawnPlayer", location);
-    console.log(location);
   }
 
-  addChest(id, chest) {
-    this.chests[id] = chest;
-    console.log(chest);
+  addChest(chestId, chest) {
+    this.chests[chestId] = chest;
+    this.scene.events.emit("chestSpawned", chest);
   }
 
-  deleteChest() {}
+  deleteChest(chestId) {
+    delete this.chests[chestId];
+  }
 }
