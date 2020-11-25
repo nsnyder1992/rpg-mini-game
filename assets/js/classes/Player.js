@@ -1,8 +1,19 @@
+const Direction = {
+  RIGHT: "RIGHT",
+  LEFT: "LEFT",
+  DOWN: "DOWN",
+  UP: "UP",
+};
+
 class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, key, frame) {
     super(scene, x, y, key, frame);
     this.scene = scene; //the scene this player will be added to
-    this.velocity = 135; //velocity when moving our player
+    this.velocity = 135; //velocity when moving the player
+    this.direction = Direction.DOWN; //direction of the player
+    this.playerAttacking = false; //is the player attacking
+    this.weaponHit = false; //did the weapon hit and enemy
+    this.speed = this.velocity; //set speed for reference
 
     //enable physics
     this.scene.physics.world.enable(this);
@@ -34,55 +45,76 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     let space = cursors.space.isDown;
     let shift = cursors.shift.isDown;
 
+    //set sprint value
+    if (shift) {
+      this.velocity = this.speed * 1.6;
+    } else {
+      this.velocity = this.speed;
+    }
     //get current direction the player is facing
     let currentAnim = this.anims.getCurrentKey();
 
     //walking logic
     if (left && up) {
       this.body.setVelocity(-this.velocity, -this.velocity);
+      this.direction = Direction.LEFT;
       this.anims.play("left", true);
     } else if (left && down) {
       this.body.setVelocity(-this.velocity, this.velocity);
+      this.direction = Direction.LEFT;
       this.anims.play("left", true);
     } else if (right && up) {
       this.body.setVelocity(this.velocity, -this.velocity);
+      this.direction = Direction.RIGHT;
       this.anims.play("right", true);
     } else if (right && down) {
       this.body.setVelocity(this.velocity, this.velocity);
+      this.direction = Direction.RIGHT;
       this.anims.play("right", true);
     } else if (left) {
       this.body.setVelocity(-this.velocity, 0);
+      this.direction = Direction.LEFT;
       this.anims.play("left", true);
     } else if (right) {
       this.body.setVelocity(this.velocity, 0);
+      this.direction = Direction.RIGHT;
       this.anims.play("right", true);
     } else if (up) {
       this.body.setVelocity(0, -this.velocity);
+      this.direction = Direction.UP;
       this.anims.play("up", true);
     } else if (down) {
       this.body.setVelocity(0, this.velocity);
+      this.direction = Direction.Down;
       this.anims.play("down", true);
     } else if (space && currentAnim == "up") {
       this.body.setVelocity(0);
+      this.playerAttacking = true;
       this.anims.chain("spearBack");
       this.anims.stop();
     } else if (space && currentAnim == "left") {
       this.body.setVelocity(0);
+      this.playerAttacking = true;
       this.anims.chain("spearLeft");
       this.anims.stop();
     } else if (space && currentAnim == "down") {
       this.body.setVelocity(0);
+      this.playerAttacking = true;
       this.anims.chain("spearFront");
       this.anims.stop();
     } else if (space && currentAnim == "right") {
       this.body.setVelocity(0);
+      this.playerAttacking = true;
       this.anims.chain("spearRight");
       this.anims.stop();
     } else if (space && currentAnim == undefined) {
+      this.playerAttacking = true;
       this.anims.play("spearFront", true);
     } else if (space) {
+      this.playerAttacking = true;
       this.anims.play(currentAnim, true);
     } else {
+      this.playerAttacking = false;
       this.body.setVelocity(0);
       this.anims.stop();
     }
