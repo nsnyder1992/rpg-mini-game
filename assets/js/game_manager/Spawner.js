@@ -1,5 +1,5 @@
 class Spawner {
-  constructor(config, spawnLocations, addObject, deleteObject) {
+  constructor(config, spawnLocations, addObject, deleteObject, moveObjects) {
     this.id = config.id;
     this.spawnInterval = config.spawnInterval;
     this.limit = config.limit;
@@ -11,6 +11,7 @@ class Spawner {
     this.objectsCreated = [];
 
     this.start();
+    this.moveObjects = moveObjects;
   }
 
   start() {
@@ -19,6 +20,8 @@ class Spawner {
         this.spawnObject();
       }
     }, this.spawnInterval);
+
+    if (this.objectType === SpawnerType.MONSTER) this.moveMonsters();
   }
 
   spawnObject() {
@@ -75,5 +78,15 @@ class Spawner {
   removeObject(id) {
     this.objectsCreated = this.objectsCreated.filter((obj) => obj.id !== id);
     this.deleteObject(id);
+  }
+
+  moveMonsters() {
+    this.moveMonsterInterval = setInterval(() => {
+      this.objectsCreated.forEach((monster) => {
+        monster.move();
+      });
+
+      this.moveObjects();
+    }, 1000);
   }
 }

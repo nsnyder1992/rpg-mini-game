@@ -6,7 +6,7 @@ const Direction = {
 };
 
 class Player extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y, key, frame) {
+  constructor(scene, x, y, key, frame, health, maxHealth, id, attackAudio) {
     super(scene, x, y, key, frame);
     this.scene = scene; //the scene this player will be added to
     this.velocity = 135; //velocity when moving the player
@@ -14,6 +14,10 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.playerAttacking = false; //is the player attacking
     this.weaponHit = false; //did the weapon hit and enemy
     this.speed = this.velocity; //set speed for reference
+    this.health = health;
+    this.maxHealth = maxHealth;
+    this.id = id;
+    this.attackAudio = attackAudio;
 
     //enable physics
     this.scene.physics.world.enable(this);
@@ -34,6 +38,38 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
     //have camera follow the player
     this.scene.cameras.main.startFollow(this);
+
+    //create player healthbar
+    this.createHealthBar();
+  }
+
+  createHealthBar() {
+    this.healthBar = this.scene.add.graphics();
+    this.updateHealthBar();
+  }
+
+  updateHealthBar() {
+    this.healthBar.clear();
+    this.healthBar.fillStyle(0xffffff, 1);
+    this.healthBar.fillRect(this.x - 32, this.y - 40, 64, 5);
+    this.healthBar.fillGradientStyle(0xff0000, 0xffffff, 4);
+    this.healthBar.fillRect(
+      this.x - 32,
+      this.y - 40,
+      64 * (this.health / this.maxHealth),
+      5
+    );
+  }
+
+  updateHealth(health) {
+    this.health = health;
+    this.updateHealthBar();
+  }
+
+  respawn(playerObject) {
+    this.health = playerObject.health;
+    this.setPosition(playerObject.x, playerObject.y);
+    this.updateHealthBar();
   }
 
   update(cursors, altCursors) {
@@ -44,6 +80,25 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     let left = cursors.left.isDown || altCursors.A.isDown;
     let space = cursors.space.isDown;
     let shift = cursors.shift.isDown;
+
+    if (
+      Phaser.Input.Keyboard.JustDown(cursors.space) &&
+      !this.playerAttacking &&
+      this.body.velocity.x === 0 &&
+      this.body.velocity.y === 0
+    ) {
+      this.playerAttacking = true;
+      this.attackAudio.play();
+      this.scene.time.delayedCall(
+        850,
+        () => {
+          this.playerAttacking = false;
+          this.weaponHit = false;
+        },
+        [],
+        this
+      );
+    }
 
     //set sprint value
     if (shift) {
@@ -87,37 +142,32 @@ class Player extends Phaser.Physics.Arcade.Sprite {
       this.body.setVelocity(0, this.velocity);
       this.direction = Direction.Down;
       this.anims.play("down", true);
-    } else if (space && currentAnim == "up") {
+    } else if (this.playerAttacking && currentAnim == "up") {
       this.body.setVelocity(0);
-      this.playerAttacking = true;
       this.anims.chain("spearBack");
       this.anims.stop();
-    } else if (space && currentAnim == "left") {
+    } else if (this.playerAttacking && currentAnim == "left") {
       this.body.setVelocity(0);
-      this.playerAttacking = true;
       this.anims.chain("spearLeft");
       this.anims.stop();
-    } else if (space && currentAnim == "down") {
+    } else if (this.playerAttacking && currentAnim == "down") {
       this.body.setVelocity(0);
-      this.playerAttacking = true;
       this.anims.chain("spearFront");
       this.anims.stop();
-    } else if (space && currentAnim == "right") {
+    } else if (this.playerAttacking && currentAnim == "right") {
       this.body.setVelocity(0);
-      this.playerAttacking = true;
       this.anims.chain("spearRight");
       this.anims.stop();
-    } else if (space && currentAnim == undefined) {
-      this.playerAttacking = true;
+    } else if (this.playerAttacking && currentAnim == undefined) {
       this.anims.play("spearFront", true);
-    } else if (space) {
-      this.playerAttacking = true;
+    } else if (this.playerAttacking) {
       this.anims.play(currentAnim, true);
     } else {
-      this.playerAttacking = false;
       this.body.setVelocity(0);
       this.anims.stop();
     }
+
+    this.updateHealthBar();
   }
 
   createAnims() {
