@@ -6,14 +6,20 @@
     <title>RPG Mini-Game</title>
 </head>
 <body>
-    <div id="phaser-game"></div>
-    <p>Use the following commands to play:</p>
-    <p>Up Arrow or W = Move Character Up</p>
-    <p>Down Arrow or S = Move Character Down</p>
-    <p>Right Arrow or D = Move Character Right</p>
-    <p>Left Arrow or A = Move Character Left</p>
-    <p>Hold Shift = Character will sprint</p>
-    <p>Press Space = Character will attack</p>
+    <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
+        <div id="phaser-game"></div>
+        <div class="controls" style="position: relative; top: 300px; left: -250px;">
+            <p>Use the following commands to play:</p>
+            <p>Up Arrow or W = Move Character Up</p>
+            <p>Down Arrow or S = Move Character Down</p>
+            <p>Right Arrow or D = Move Character Right</p>
+            <p>Left Arrow or A = Move Character Left</p>
+            <p>Hold Shift = Character will sprint</p>
+            <p>Press Space = Character will attack</p>
+        </div>
+    </div>
+    
+    
 </body>
 <script src="assets/js/lib/phaser.min.js" charset="utf-8"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/node-uuid/1.4.8/uuid.min.js"
