@@ -44,7 +44,7 @@ class Spawner {
     this.addObject(chest.id, chest);
   }
 
-  //TODO: need to make random monster to pick which sprite an which weapon
+  //TODO: need to make random monster to pick which sprite from new spritesheets and which weapon
   spawnMonster() {
     const location = this.pickRandomLocation();
     const monster = new MonsterModel(
